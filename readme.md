@@ -6,7 +6,7 @@
 -   joi (валидация)
 -   ... express, cors, nodemon ...
 
-# убрать запятые: ???НЕ РАБОТАЕТ???
+# убрать запятые:
 
 -   пакет eslint-config-prettier
 -   пакет eslint-plugin-json
