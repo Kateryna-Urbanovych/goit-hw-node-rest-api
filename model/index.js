@@ -1,35 +1,58 @@
-const db = require('./db');
-const { v4: uuid } = require('uuid');
+const db = require('./db')
+const { ObjectID } = require('mongodb')
+
+const getCollection = async (db, name) => {
+    const client = await db
+    const collection = await client.db().collection(name)
+    return collection
+}
 
 const listContacts = async () => {
-    return db.value();
-};
+    const collection = await getCollection(db, 'contacts')
+    const results = await collection.find({}).toArray()
+    return results
+}
 
 const getContactById = async contactId => {
-    return db.find({ id: contactId }).value();
-};
+    const collection = await getCollection(db, 'contacts')
+    const objectId = new ObjectID(contactId)
+    const result = await collection.find({ _id: objectId }).toArray()
+    return result
+}
+// console.log(objectId.getTimestamp());  - время
 // или Number(contactId), если id - это число, а не строка
 
 const addContact = async body => {
-    const contactId = uuid();
-    const record = {
-        id: contactId,
-        ...body,
-    };
-    db.push(record).write();
-    return record;
-};
+    const record = { ...body }
+
+    const collection = await getCollection(db, 'contacts')
+    const {
+        ops: [result],
+    } = await collection.insertOne(record)
+    return result
+}
 
 const updateContact = async (contactId, body) => {
-    const record = db.find({ id: contactId }).assign(body).value();
-    db.write();
-    return record.id ? record : null;
-};
+    const collection = await getCollection(db, 'contacts')
+    const objectId = new ObjectID(contactId)
+
+    const { value: result } = await collection.findOneAndUpdate(
+        { _id: objectId },
+        { $set: body },
+        { returnOriginal: false },
+    )
+    return result
+}
 
 const removeContact = async contactId => {
-    const [record] = db.remove({ id: contactId }).write();
-    return record;
-};
+    const collection = await getCollection(db, 'contacts')
+    const objectId = new ObjectID(contactId)
+
+    const { value: result } = await collection.findOneAndDelete({
+        _id: objectId,
+    })
+    return result
+}
 
 module.exports = {
     listContacts,
@@ -37,4 +60,4 @@ module.exports = {
     removeContact,
     addContact,
     updateContact,
-};
+}
