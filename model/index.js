@@ -1,35 +1,35 @@
-const db = require('./db');
-const { v4: uuid } = require('uuid');
+const Contact = require('./schemas/contact')
 
 const listContacts = async () => {
-    return db.value();
-};
+    const results = await Contact.find({})
+    return results
+}
 
 const getContactById = async contactId => {
-    return db.find({ id: contactId }).value();
-};
-// или Number(contactId), если id - это число, а не строка
+    const result = await Contact.findOne({ _id: contactId })
+    return result
+}
 
 const addContact = async body => {
-    const contactId = uuid();
-    const record = {
-        id: contactId,
-        ...body,
-    };
-    db.push(record).write();
-    return record;
-};
+    const result = await Contact.create(body)
+    return result
+}
 
 const updateContact = async (contactId, body) => {
-    const record = db.find({ id: contactId }).assign(body).value();
-    db.write();
-    return record.id ? record : null;
-};
+    const result = await Contact.findByIdAndUpdate(
+        { _id: contactId },
+        { ...body },
+        { new: true },
+    )
+    return result
+}
 
 const removeContact = async contactId => {
-    const [record] = db.remove({ id: contactId }).write();
-    return record;
-};
+    const result = await Contact.findByIdAndRemove({
+        _id: contactId,
+    })
+    return result
+}
 
 module.exports = {
     listContacts,
@@ -37,4 +37,4 @@ module.exports = {
     removeContact,
     addContact,
     updateContact,
-};
+}
