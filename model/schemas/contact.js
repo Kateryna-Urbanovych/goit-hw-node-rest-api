@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const { Schema, model } = mongoose
+const { Schema, model, SchemaTypes } = mongoose
 
 const contactSchema = new Schema(
     {
@@ -7,12 +7,14 @@ const contactSchema = new Schema(
             type: String,
             required: [true, 'Set name for contact'],
             min: 3,
-            max: 10,
+            max: 30,
         },
         email: {
             type: String,
-            required: [true, 'Set email for contact'],
-            unique: true,
+            validate(value) {
+                const re = /\S+@\S+\.\S+/
+                return re.test(String(value).toLowerCase())
+            },
         },
         phone: {
             type: String,
@@ -22,15 +24,18 @@ const contactSchema = new Schema(
         },
         subscription: {
             type: String,
-            required: [true, 'Set subscription for contact'],
         },
+        // ?????????????????????
         password: {
             type: String,
-            required: [true, 'Set password for contact'],
-            unique: true,
             min: 5,
         },
-        token: String,
+        // ??????????????????????
+        // token: String,
+        owner: {
+            type: SchemaTypes.ObjectId,
+            ref: 'user',
+        },
     },
     {
         versionKey: false,

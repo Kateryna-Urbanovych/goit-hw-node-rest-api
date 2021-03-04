@@ -1,4 +1,4 @@
-const Contacts = require('../model/index')
+const Contacts = require('../model/contacts')
 
 // @ GET /api/contacts
 const listContacts = async (_req, res, next) => {
