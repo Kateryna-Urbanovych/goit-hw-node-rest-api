@@ -2,8 +2,7 @@ const mongoose = require('mongoose')
 const { Schema, model } = mongoose
 const bcrypt = require('bcryptjs')
 const { Subscription } = require('../../helpers/constants')
-require('dotenv').config()
-const saltWorkFactor = process.env.SALT_WORK_FACTOR
+const SALT_WORK_FACTOR = 8
 
 const userSchema = new Schema(
     {
@@ -54,7 +53,7 @@ userSchema.pre('save', async function (next) {
     if (!this.isModified('password')) {
         return next()
     }
-    const salt = await bcrypt.genSalt(saltWorkFactor)
+    const salt = await bcrypt.genSalt(SALT_WORK_FACTOR)
     this.password = await bcrypt.hash(this.password, salt, null)
     next()
 })

@@ -10,6 +10,7 @@ const findById = async id => {
 
 const create = async ({ email, password, subscription }) => {
     const user = new User({ email, password, subscription })
+    console.log(user)
     return await user.save()
 }
 
