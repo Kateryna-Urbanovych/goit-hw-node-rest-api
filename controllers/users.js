@@ -33,6 +33,7 @@ const register = async (req, res, next) => {
     }
 }
 
+// /auth/login
 const login = async (req, res, next) => {
     try {
         const { email, password } = req.body
@@ -60,6 +61,55 @@ const login = async (req, res, next) => {
         next(e)
     }
 }
-const logout = async (req, res, next) => {}
 
-module.exports = { register, login, logout }
+// /auth/logout
+const logout = async (req, res, next) => {
+    try {
+        const userId = req.user.id
+        const loggedUser = await Users.findById(userId)
+
+        if (loggedUser) {
+            await Users.updateToken(userId, null)
+            return res.status(HttpCode.NO_CONTENT).json({})
+        } else {
+            return res.status(HttpCode.UNAUTHORIZED).json({
+                status: 'error',
+                code: HttpCode.UNAUTHORIZED,
+                data: 'Unauthorized',
+                message: 'Not authorized',
+            })
+        }
+    } catch (e) {
+        next(e)
+    }
+}
+
+// /current
+const current = async (req, res, next) => {
+    try {
+        const userId = req.user.id
+        const currentUser = await Users.findById(userId)
+
+        if (currentUser) {
+            return res.status(HttpCode.OK).json({
+                status: 'success',
+                code: HttpCode.OK,
+                data: {
+                    email: currentUser.email,
+                    subscription: currentUser.subscription,
+                },
+            })
+        } else {
+            return res.status(HttpCode.UNAUTHORIZED).json({
+                status: 'error',
+                code: HttpCode.UNAUTHORIZED,
+                data: 'Unauthorized',
+                message: 'Not authorized',
+            })
+        }
+    } catch (e) {
+        next(e)
+    }
+}
+
+module.exports = { register, login, logout, current }
