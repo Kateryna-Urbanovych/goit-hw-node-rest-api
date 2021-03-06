@@ -11,10 +11,11 @@ const contactSchema = new Schema(
         },
         email: {
             type: String,
-            validate(value) {
-                const re = /\S+@\S+\.\S+/
-                return re.test(String(value).toLowerCase())
-            },
+            // validate(value) {
+            //     const re = /\S+@\S+\.\S+/
+            //     return re.test(String(value).toLowerCase())
+            // },
+            default: '',
         },
         phone: {
             type: String,
@@ -24,14 +25,8 @@ const contactSchema = new Schema(
         },
         subscription: {
             type: String,
+            default: '',
         },
-        // ?????????????????????
-        password: {
-            type: String,
-            min: 5,
-        },
-        // ??????????????????????
-        // token: String,
         owner: {
             type: SchemaTypes.ObjectId,
             ref: 'user',
