@@ -5,11 +5,11 @@ const { HttpCode } = require('../helpers/constants')
 const listContacts = async (req, res, next) => {
     try {
         const userId = req.user.id
-        const contacts = await Contacts.listContacts(userId)
+        const contacts = await Contacts.listContacts(userId, req.query)
         return res.status(HttpCode.OK).json({
             status: 'success',
             code: HttpCode.OK,
-            data: contacts,
+            data: { ...contacts },
         })
     } catch (e) {
         next(e)
