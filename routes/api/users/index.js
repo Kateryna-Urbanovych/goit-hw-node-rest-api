@@ -21,5 +21,6 @@ router.patch(
     [guard, upload.single('avatar'), validateUploadAvatar],
     usersController.avatars,
 )
+router.patch('/update', guard, usersController.update)
 
 module.exports = router

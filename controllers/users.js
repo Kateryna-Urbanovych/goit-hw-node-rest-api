@@ -121,9 +121,9 @@ const current = async (req, res, next) => {
 // /avatars
 const avatars = async (req, res, next) => {
     try {
-        const id = req.user.id
+        const userId = req.user.id
         const avatarURL = await saveAvatarToStatic(req)
-        await Users.updateAvatar(id, avatarURL)
+        await Users.updateAvatar(userId, avatarURL)
         return res.json({
             status: 'success',
             code: HttpCode.OK,
@@ -137,7 +137,7 @@ const avatars = async (req, res, next) => {
 }
 
 const saveAvatarToStatic = async req => {
-    const id = req.user.id
+    const userId = req.user.id
     const AVATARS_OF_USERS = process.env.AVATARS_OF_USERS
     const pathFile = req.file.path
     const newNameAvatar = `${Date.now()}-${req.file.originalname}`
@@ -150,12 +150,12 @@ const saveAvatarToStatic = async req => {
             Jimp.HORIZONTAL_ALIGN_CENTER | Jimp.VERTICAL_ALIGN_MIDDLE,
         )
         .writeAsync(pathFile)
-    await createFolderIsExist(path.join('public', AVATARS_OF_USERS, id))
+    await createFolderIsExist(path.join('public', AVATARS_OF_USERS, userId))
     await fs.rename(
         pathFile,
-        path.join('public', AVATARS_OF_USERS, id, newNameAvatar),
+        path.join('public', AVATARS_OF_USERS, userId, newNameAvatar),
     )
-    const avatarURL = path.normalize(path.join(id, newNameAvatar))
+    const avatarURL = path.normalize(path.join(userId, newNameAvatar))
     try {
         await fs.unlink(path.join('/public', AVATARS_OF_USERS, req.user.avatar))
     } catch (e) {
@@ -164,4 +164,35 @@ const saveAvatarToStatic = async req => {
     return avatarURL
 }
 
-module.exports = { register, login, logout, current, avatars }
+const update = async (req, res, next) => {
+    try {
+        const userId = req.user.id
+        const user = await Users.updateUser(userId, req.body)
+
+        if (!req.body) {
+            return res.status(HttpCode.BAD_REQUEST).json({
+                status: 'error',
+                code: HttpCode.BAD_REQUEST,
+                message: 'missing fields',
+            })
+        }
+
+        if (user) {
+            return res.status(HttpCode.OK).json({
+                status: 'success',
+                code: HttpCode.OK,
+                data: 'Updated successfully',
+            })
+        } else {
+            return res.status(HttpCode.NOT_FOUND).json({
+                status: 'error',
+                code: HttpCode.NOT_FOUND,
+                message: 'Not Found',
+            })
+        }
+    } catch (e) {
+        next(e)
+    }
+}
+
+module.exports = { register, login, logout, current, avatars, update }
