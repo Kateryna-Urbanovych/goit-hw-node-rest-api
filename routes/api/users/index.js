@@ -4,6 +4,7 @@ const validate = require('./validation')
 const usersController = require('../../../controllers/users')
 const guard = require('../../../helpers/guard')
 const upload = require('../../../helpers/upload')
+const { validateUploadAvatar } = require('./validation')
 const { createAccountLimiter } = require('../../../helpers/rate-limit-register')
 
 router.post(
@@ -17,8 +18,7 @@ router.post('/auth/logout', guard, usersController.logout)
 router.post('/current', guard, usersController.current)
 router.patch(
     '/avatars',
-    guard,
-    upload.single('avatar'),
+    [guard, upload.single('avatar'), validateUploadAvatar],
     usersController.avatars,
 )
 
