@@ -1,4 +1,5 @@
 const Joi = require('joi')
+const { HttpCode } = require('../../../helpers/constants')
 
 const schemaRegister = Joi.object({
     email: Joi.string().email().required(),
@@ -16,7 +17,7 @@ const validate = (schema, obj, next) => {
     if (error) {
         const [{ message }] = error.details
         return next({
-            status: 400,
+            status: HttpCode.BAD_REQUEST,
             message: `Filed: ${message.replace(/"/g, '')}`,
         })
     }
@@ -29,4 +30,16 @@ module.exports.register = (req, _res, next) => {
 
 module.exports.login = (req, _res, next) => {
     return validate(schemaLogin, req.body, next)
+}
+
+module.exports.validateUploadAvatar = (req, res, next) => {
+    if (!req.file) {
+        return res.status(HttpCode.BAD_REQUEST).json({
+            status: 'error',
+            code: HttpCode.BAD_REQUEST,
+            data: 'Bad request',
+            message: 'Not authorized', // или 'Field of avatar with file not found'
+        })
+    }
+    next()
 }
