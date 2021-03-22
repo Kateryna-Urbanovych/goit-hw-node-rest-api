@@ -23,6 +23,6 @@ router.patch(
 )
 router.patch('/update', guard, usersController.update)
 
-router.get('/auth/verify/:verificationToken', userController.verify)
+router.get('/auth/verify/:verificationToken', usersController.verify)
 
 module.exports = router
